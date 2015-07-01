@@ -1,0 +1,18 @@
+#!/bin/bash
+#
+# IM - Interactive matlab shell
+#
+# Run the given commands in the shell in the currently active matlab COM session
+
+# Use VIM keybindings
+set -o vi
+
+# Use pathname expansion
+shopt -qs extglob
+
+while read -ep ">> " command; do
+  history -s $command
+  echo "Wscript.Echo(CreateObject(\"Matlab.Application\").Execute(\"rehash;$command\"))" > matlabcmd.tmp.vbs
+  cscript //nologo matlabcmd.tmp.vbs
+  rm matlabcmd.tmp.vbs
+done
