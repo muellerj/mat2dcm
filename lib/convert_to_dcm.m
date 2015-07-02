@@ -75,6 +75,9 @@ try
       case 'kennlinie'
         counter.kennlinie = counter.kennlinie + 1;
         write_kennlinie(fid, options, paramname, paramvalue);
+      case 'kennfeld'
+        counter.kennfeld = counter.kennfeld + 1;
+        write_kennfeld(fid, options, paramname, paramvalue);
     end
   end
 catch exception
@@ -86,10 +89,7 @@ end
 fclose(fid);
 
 % Print report if required
-if options.Verbose
-  print_status(dcmfilename, counter);
-end
-
+if options.Verbose, print_status(dcmfilename, counter); end
 
 function paramtype = categorise_param(name, value)
 if isstruct(value) && isfield(value, 'x') && isfield(value, 'y') && isfield(value, 'z')
@@ -192,16 +192,8 @@ end
 fprintf(fid, '\n');
 fprintf(fid, 'END\n\n');
 
-function write_lookup_table(fid, options, name, value)
-% Write a given lookup-table to file identified by fid
-if ~isfield(value, 'xunit'), value.xunit = '-'; end
-if ~isfield(value, 'yunit'), value.yunit = '-'; end
-if ~isfield(value, 'zunit'), value.zunit = '-'; end
-
-fprintf(fid, 'GRUPPENKENNFELD %s %1.0f %1.0f\n', name, size(value.z, 2), size(value.z, 1));
-fprintf(fid, '   EINHEIT_X "%s"\n', value.xunit);
-fprintf(fid, '   EINHEIT_Y "%s"\n', value.yunit);
-fprintf(fid, '   EINHEIT_W "%s"\n', value.zunit);
+function write_kennfeld(fid, options, name, value)
+fprintf(fid, 'KENNFELD %s %1.0f %1.0f\n', name, size(value.z, 2), size(value.z, 1));
 fprintf(fid, '   ST/X');
 for xidx = 1:length(value.x)
   if iscell(value.x)
@@ -226,7 +218,6 @@ end
 fprintf(fid, 'END\n\n');
 
 function print_status(dcmfilename, c)
-% Print how many labels of each type were exported
 [pathstr, name, ext] = fileparts(dcmfilename);
 fprintf(1, '%s: Exported %d %s, %d %s, %d %s, %d %s\n', ...
   [name ext], ...
@@ -244,8 +235,4 @@ if fid == -1, error('Cannot open DCM file for write access'); end
 
 function c = ternary(condition, a, b)
 % Provide a shorthand for conditionals
-if condition
-  c = a;
-else
-  c = b;
-end
+if condition, c = a; else c = b; end
