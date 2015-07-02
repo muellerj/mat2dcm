@@ -194,24 +194,34 @@ fprintf(fid, 'END\n\n');
 
 function write_kennfeld(fid, options, name, value)
 fprintf(fid, 'KENNFELD %s %1.0f %1.0f\n', name, size(value.z, 2), size(value.z, 1));
-fprintf(fid, '   ST/X');
-for xidx = 1:length(value.x)
-  if iscell(value.x)
-    fprintf(fid, ['   %s'], value.x{xidx});
-  else
+if iscell(value.x)
+  fprintf(fid, '   ST_TX/X');
+  for xidx = 1:length(value.x)
+    fprintf(fid, '   "%s"', value.x{xidx});
+  end
+else
+  fprintf(fid, '   ST/X');
+  for xidx = 1:length(value.x)
     fprintf(fid, ['   ' options.Precision], value.x(xidx));
   end
 end
 fprintf(fid, '\n');
 for yidx = 1:length(value.y)
   if iscell(value.y)
-    fprintf(fid, ['   ST_TX/Y   %s\n'], value.y{yidx});
+    fprintf(fid, '   ST_TX/Y   "%s"\n', value.y{yidx});
   else
     fprintf(fid, ['   ST/Y   ' options.Precision '\n'], value.y(yidx));
   end
-  fprintf(fid, '   WERT');
-  for xidx = 1:length(value.x)
-    fprintf(fid, ['   ' options.Precision], value.z(yidx,xidx));
+  if iscell(value.z)
+    fprintf(fid, '   TEXT');
+    for xidx = 1:length(value.x)
+      fprintf(fid, '   "%s"', value.z{yidx,xidx});
+    end
+  else
+    fprintf(fid, '   WERT');
+    for xidx = 1:length(value.x)
+      fprintf(fid, ['   ' options.Precision], value.z(yidx,xidx));
+    end
   end
   fprintf(fid, '\n');
 end
