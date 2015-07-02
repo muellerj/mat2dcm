@@ -61,38 +61,21 @@ write_header(fid, options);
 try
   for pidx = 1:length(paramlist)
 
-    % Extract parameter
     paramname  = paramlist{pidx};
     paramvalue = eval(paramname);
     paramsize  = size(paramvalue);
     paramname  = [options.Prefix paramname];
 
-    % Process parameter depending on its type
     switch categorise_param(paramname, paramvalue)
-      case 'festwert-numeric'
+      case 'festwert'
         counter.festwert = counter.festwert + 1;
-        write_festwert_numeric(fid, options, paramname, paramvalue);
-      case 'festwert-text'
-        counter.festwert = counter.festwert + 1;
-        write_festwert_text(fid, options, paramname, paramvalue);
-      case 'festwerteblock-numeric'
+        write_festwert(fid, options, paramname, paramvalue);
+      case 'festwerteblock'
         counter.festwerteblock = counter.festwerteblock + 1;
-        write_festwerteblock_numeric(fid, options, paramname, paramvalue);
-      case 'festwerteblock-text'
-        counter.festwerteblock = counter.festwerteblock + 1;
-        write_festwerteblock_text(fid, options, paramname, paramvalue);
-      case 'matrix'
-        counter.matrices = counter.matrices + 1;
-        write_matrix(fid, options, paramname, paramvalue);
-      case 'lookup-line'
-        counter.lulines = counter.lulines + 1;
-        write_lookup_line(fid, options, paramname, paramvalue);
-      case 'lookup-table'
-        counter.lutables = counter.lutables + 1;
-        write_lookup_table(fid, options, paramname, paramvalue);
-      otherwise
-        paramvalue
-        error([paramname ' does not match any of the recognised types: ' num2str(paramvalue)]);
+        write_festwerteblock(fid, options, paramname, paramvalue);
+      case 'kennkinie'
+        counter.kennlinie = counter.kennlinie + 1;
+        write_kennlinie(fid, options, paramname, paramvalue);
     end
   end
 catch exception
@@ -110,26 +93,14 @@ end
 
 
 function paramtype = categorise_param(name, value)
-% Categorise a given parameter into one of scalar, vector, matrix,
-% lookup-line or lookup-table
 if isstruct(value) && isfield(value, 'x') && isfield(value, 'y') && isfield(value, 'z')
-  paramtype = 'lookup-table';
+  paramtype = 'kennfeld';
 elseif isstruct(value) && isfield(value, 'x') && isfield(value, 'y')
-  paramtype = 'lookup-line';
-elseif iscell(value)
-  if all(size(value) == 1)
-    paramtype = 'festwert-text';
-  else
-    paramtype = 'festwerteblock-text';
-  end
+  paramtype = 'kennlinie';
 elseif all(size(value) == 1)
-  paramtype = 'festwert-numeric';
-elseif any(size(value) == 1)
-  paramtype = 'festwerteblock-numeric';
-elseif all(size(value) > 1)
-  paramtype = 'matrix';
+  paramtype = 'festwert';
 else
-  paramtype = 'unknown';
+  paramtype = 'festwerteblock';
 end
 
 function write_header(fid, options)
@@ -142,30 +113,27 @@ fprintf(fid, '\n\n');
 fprintf(fid, 'KONSERVIERUNG_FORMAT 2.0');
 fprintf(fid, '\n\n');
 
-function write_festwert_numeric(fid, options, name, value)
+function write_festwert(fid, options, name, value)
 fprintf(fid, 'FESTWERT %s\n', name);
-fprintf(fid, ['   WERT ' options.Precision '\n'], value);
-fprintf(fid, 'END\n\n');
-
-function write_festwert_text(fid, options, name, value)
-fprintf(fid, 'FESTWERT %s\n', name);
-fprintf(fid, '   TEXT "%s"\n', value{:});
-fprintf(fid, 'END\n\n');
-
-function write_festwerteblock_numeric(fid, options, name, value)
-fprintf(fid, 'FESTWERTEBLOCK %s %1.0f\n', name, size(value, 2));
-fprintf(fid, '   WERT');
-for cidx = 1:size(value, 2)
-  fprintf(fid, ['   ' options.Precision], value(cidx));
+if iscell(value)
+  fprintf(fid, '   TEXT "%s"\n', value{:});
+else
+  fprintf(fid, ['   WERT ' options.Precision '\n'], value);
 end
-fprintf(fid, '\n');
 fprintf(fid, 'END\n\n');
 
-function write_festwerteblock_text(fid, options, name, value)
+function write_festwerteblock(fid, options, name, value)
 fprintf(fid, 'FESTWERTEBLOCK %s %1.0f\n', name, size(value, 2));
+if iscell(value)
 fprintf(fid, '   TEXT');
-for cidx = 1:size(value, 2)
-  fprintf(fid, '   "%s"', value{cidx});
+  for cidx = 1:size(value, 2)
+    fprintf(fid, '   "%s"', value{cidx});
+  end
+else
+fprintf(fid, '   WERT');
+  for cidx = 1:size(value, 2)
+    fprintf(fid, ['   ' options.Precision], value(cidx));
+  end
 end
 fprintf(fid, '\n');
 fprintf(fid, 'END\n\n');
@@ -256,13 +224,12 @@ fprintf(fid, 'END\n\n');
 function print_status(dcmfilename, c)
 % Print how many labels of each type were exported
 [pathstr, name, ext] = fileparts(dcmfilename);
-fprintf(1, '%s: Exported %d %s, %d %s, %d %s, %d %s, %d %s\n', ...
+fprintf(1, '%s: Exported %d %s, %d %s, %d %s, %d %s\n', ...
   [name ext], ...
-  c.scalars, ternary(c.scalars == 1, 'scalar', 'scalars'), ...
-  c.vectors, ternary(c.vectors == 1, 'vector', 'vectors'), ...
-  c.matrices, ternary(c.matrices == 1, 'matrix', 'matrices'), ...
-  c.lulines, ternary(c.lulines == 1, 'lookup-line', 'lookup-lines'), ...
-  c.lutables, ternary(c.lutables == 1, 'lookup-table', 'lookup-tables') ...
+  c.festwert, ternary(c.festwert == 1, 'Festwert', 'Festwerte'), ...
+  c.festwerteblock, ternary(c.festwerteblock == 1, 'Festwerteblock', 'Festwerteblöcke'), ...
+  c.kennlinie, ternary(c.kennlinie == 1, 'Kennlinie', 'Kennlinien'), ...
+  c.kennfeld, ternary(c.kennfeld == 1, 'Kennfeld', 'Kennfelder') ...
   );
 
 function fid = open_file_connection(dcmfilename, options)
