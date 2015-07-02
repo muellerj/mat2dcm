@@ -34,9 +34,8 @@ options.Encoding     = 'windows-1250';
 counter                = struct();
 counter.festwert       = 0;
 counter.festwerteblock = 0;
-counter.matrices       = 0;
-counter.lulines        = 0;
-counter.lutables       = 0;
+counter.kennlinie      = 0;
+counter.kennfeld       = 0;
 
 % ... and let the user override them
 for vidx = 1:2:nargin-2
@@ -73,7 +72,7 @@ try
       case 'festwerteblock'
         counter.festwerteblock = counter.festwerteblock + 1;
         write_festwerteblock(fid, options, paramname, paramvalue);
-      case 'kennkinie'
+      case 'kennlinie'
         counter.kennlinie = counter.kennlinie + 1;
         write_kennlinie(fid, options, paramname, paramvalue);
     end
@@ -165,17 +164,12 @@ else
   fprintf(fid, 'END\n\n');
 end
 
-function write_lookup_line(fid, options, name, value)
-% Write a given lookup-line to file identified by fid
-if ~isfield(value, 'xunit'), value.xunit = '-'; end
-if ~isfield(value, 'yunit'), value.yunit = '-'; end
+function write_kennlinie(fid, options, name, value)
 if length(value.x) ~= length(value.y)
   error(['Dimension mismatch for parameter ' name]);
 end
 
 fprintf(fid, 'KENNLINIE %s %1.0f\n', name, length(value.x));
-fprintf(fid, '   EINHEIT_X "%s"\n', value.xunit);
-fprintf(fid, '   EINHEIT_W "%s"\n', value.yunit);
 fprintf(fid, '   ST/X');
 for xidx = 1:length(value.x)
   fprintf(fid, ['   ' options.Precision], value.x(xidx));
