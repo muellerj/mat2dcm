@@ -12,7 +12,11 @@ for fidx = 1:length(specfiles)
   try
     feval(specfiles(fidx).name(1:end-2));
   catch exception
-    disp([exception.stack(1).file ' errors: ' exception.message]);
+    disp([exception.stack(1).file ':' num2str(exception.stack(1).line) ' - ' exception.message]);
+
+    % Delete temporary files
+    if exist('tmp.mat', 'file'), delete('tmp.mat'); end
+    if exist('tmp.dcm', 'file'), delete('tmp.dcm'); end
   end
 end
 
