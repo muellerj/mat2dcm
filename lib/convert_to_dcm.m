@@ -165,19 +165,29 @@ else
 end
 
 function write_kennlinie(fid, options, name, value)
-if length(value.x) ~= length(value.y)
-  error(['Dimension mismatch for parameter ' name]);
-end
-
 fprintf(fid, 'KENNLINIE %s %1.0f\n', name, length(value.x));
-fprintf(fid, '   ST/X');
-for xidx = 1:length(value.x)
-  fprintf(fid, ['   ' options.Precision], value.x(xidx));
+if iscell(value.x)
+  fprintf(fid, '   ST_TX/X');
+  for xidx = 1:length(value.x)
+    fprintf(fid, '   "%s"', value.x{xidx});
+  end
+else
+  fprintf(fid, '   ST/X');
+  for xidx = 1:length(value.x)
+    fprintf(fid, ['   ' options.Precision], value.x(xidx));
+  end
 end
 fprintf(fid, '\n');
-fprintf(fid, '   WERT');
-for yidx = 1:length(value.y)
-  fprintf(fid, ['   ' options.Precision], value.y(yidx));
+if iscell(value.y)
+  fprintf(fid, '   TEXT');
+  for yidx = 1:length(value.y)
+    fprintf(fid, '   "%s"', value.y{yidx});
+  end
+else
+  fprintf(fid, '   WERT');
+  for yidx = 1:length(value.y)
+    fprintf(fid, ['   ' options.Precision], value.y(yidx));
+  end
 end
 fprintf(fid, '\n');
 fprintf(fid, 'END\n\n');
