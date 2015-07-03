@@ -128,19 +128,25 @@ end
 fprintf(fid, 'END\n\n');
 
 function write_festwerteblock(fid, options, name, value)
-fprintf(fid, 'FESTWERTEBLOCK %s %1.0f\n', name, size(value, 2));
-if iscell(value)
-fprintf(fid, '   TEXT');
-  for cidx = 1:size(value, 2)
-    fprintf(fid, '   "%s"', value{cidx});
-  end
+if size(value, 1) == 1
+  fprintf(fid, 'FESTWERTEBLOCK %s %1.0f\n', name, length(value));
 else
-fprintf(fid, '   WERT');
-  for cidx = 1:size(value, 2)
-    fprintf(fid, ['   ' options.Precision], value(cidx));
-  end
+  fprintf(fid, 'FESTWERTEBLOCK %s %1.0f @ %1.0f\n', name, size(value, 2), size(value, 1));
 end
-fprintf(fid, '\n');
+for ridx = 1:size(value, 1)
+  if iscell(value)
+  fprintf(fid, '   TEXT');
+    for cidx = 1:size(value, 2)
+      fprintf(fid, '   "%s"', value{ridx,cidx});
+    end
+  else
+  fprintf(fid, '   WERT');
+    for cidx = 1:size(value, 2)
+      fprintf(fid, ['   ' options.Precision], value(ridx,cidx));
+    end
+  end
+  fprintf(fid, '\n');
+end
 fprintf(fid, 'END\n\n');
 
 
