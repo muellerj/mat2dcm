@@ -1,12 +1,16 @@
 # Matlab DCM conversion
 
-Mat2Dcm is a Matlab data format conversion tool to generate `*.dcm` files from
+`mat2dcm` is a Matlab data format conversion tool to generate `*.dcm` files from
 `*.mat` files. Heuristics are used to distinguish the data types in the
 resulting DCM. No emphasis is placed on full inforation transfer - instead only
 the value of the label is deemed important. The conversion is subsequently lossy
 and cannot be fully reversed.
 
-## Example
+## Setup
+
+Simply copy the `mat2dcm.m` under `./lib` to somewhere in your `path`.
+
+## Usage
 
 Say you want to create a DCM containing the variables `K_LABEL_N1` and
 `KL_ANOTHER_LABEL`, which you just created in your workspace:
@@ -66,9 +70,10 @@ and the destination `*.dcm` file) and a number of optional key-value paris:
 
 ## Data types
 
+Explanation, how the different data types are generated from Matlab variables.
+
 
 ## Todo
 
 * Stützstellverteilungen
 * Gruppenkennlinien/-kennfelder
-* Bessere README Formattierung
