@@ -221,7 +221,12 @@ fprintf(fid, '\n');
 fprintf(fid, 'END\n\n');
 
 function write_kennfeld(fid, options, name, value)
-fprintf(fid, 'KENNFELD %s %1.0f %1.0f\n', name, size(value.z, 2), size(value.z, 1));
+if isfield(value, 'type') && strcmpi(value.type, 'gruppenkennfeld')
+  type = 'GRUPPENKENNFELD';
+else
+  type = 'KENNFELD';
+end
+fprintf(fid, '%s %s %1.0f %1.0f\n', type, name, size(value.z, 2), size(value.z, 1));
 if iscell(value.x)
   fprintf(fid, '   ST_TX/X');
   for xidx = 1:length(value.x)

@@ -75,5 +75,4 @@ Explanation, how the different data types are generated from Matlab variables.
 
 ## Todo
 
-* Gruppenkennlinien/-kennfelder
 * Festwerteblock with 2 dimensions
