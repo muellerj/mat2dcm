@@ -171,7 +171,12 @@ else
 end
 
 function write_kennlinie(fid, options, name, value)
-fprintf(fid, 'KENNLINIE %s %1.0f\n', name, length(value.x));
+if isfield(value, 'type') && strcmpi(value.type, 'gruppenkennlinie')
+  type = 'GRUPPENKENNLINIE';
+else
+  type = 'KENNLINIE';
+end
+fprintf(fid, '%s %s %1.0f\n', type, name, length(value.x));
 if iscell(value.x)
   fprintf(fid, '   ST_TX/X');
   for xidx = 1:length(value.x)
