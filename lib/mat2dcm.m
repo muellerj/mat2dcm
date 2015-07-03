@@ -1,10 +1,10 @@
-function convert_to_dcm(matfilename, dcmfilename, varargin)
-%FUNCTION CONVERT_TO_DCM
+function mat2dcm(matfilename, dcmfilename, varargin)
+%FUNCTION MAT2DCM
 % Write a DCM of all variables saved in file MATFILENAME to DCMFILENAME.
 % Parameters can be adapted to the INCA format, whereby matrices are reshaped
 % into their transposed dimensions. Usage:
 %
-%  CONVERT_TO_DCM(MATFILENAME, DCMFILENAME[, KEY1, VAL1, ...])
+%  MAT2DCM(MATFILENAME, DCMFILENAME[, KEY1, VAL1, ...])
 %
 % where the KEYS and VALUES can be any of the following
 %
@@ -16,7 +16,7 @@ function convert_to_dcm(matfilename, dcmfilename, varargin)
 %   Encoding      Encoding to use for DCM file           'windows-1250'
 %
 % Jonas Mueller, EA-253
-% 06.03.2014
+% 02.07.2015
 
 % Parse parameters
 if nargin > 2 && mod(nargin-2, 2) ~= 0
