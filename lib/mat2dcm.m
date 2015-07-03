@@ -31,11 +31,12 @@ options.Verbose      = true;
 options.Encoding     = 'windows-1250';
 
 % Initialise counters for statistic
-counter                = struct();
-counter.festwert       = 0;
-counter.festwerteblock = 0;
-counter.kennlinie      = 0;
-counter.kennfeld       = 0;
+counter                         = struct();
+counter.festwert                = 0;
+counter.festwerteblock          = 0;
+counter.kennlinie               = 0;
+counter.kennfeld                = 0;
+counter.stuetzstellenverteilung = 0;
 
 % ... and let the user override them
 for vidx = 1:2:nargin-2
@@ -78,6 +79,9 @@ try
       case 'kennfeld'
         counter.kennfeld = counter.kennfeld + 1;
         write_kennfeld(fid, options, paramname, paramvalue);
+      case 'stuetzstellenverteilung'
+        counter.stuetzstellenverteilung = counter.stuetzstellenverteilung + 1;
+        write_stuetzstellenverteilung(fid, options, paramname, paramvalue);
     end
   end
 catch exception
@@ -96,6 +100,8 @@ if isstruct(value) && isfield(value, 'x') && isfield(value, 'y') && isfield(valu
   paramtype = 'kennfeld';
 elseif isstruct(value) && isfield(value, 'x') && isfield(value, 'y')
   paramtype = 'kennlinie';
+elseif isstruct(value) && (isfield(value, 'x') || isfield(value, 'y'))
+  paramtype = 'stuetzstellenverteilung';
 elseif all(size(value) == 1)
   paramtype = 'festwert';
 else
@@ -187,6 +193,23 @@ else
   fprintf(fid, '   WERT');
   for yidx = 1:length(value.y)
     fprintf(fid, ['   ' options.Precision], value.y(yidx));
+  end
+end
+fprintf(fid, '\n');
+fprintf(fid, 'END\n\n');
+
+function write_stuetzstellenverteilung(fid, options, name, value)
+if isfield(value, 'x'), value = value.x; else value = value.y; end
+fprintf(fid, 'STUETZSTELLENVERTEILUNG %s %1.0f\n', name, length(value));
+if iscell(value)
+  fprintf(fid, '   ST_TX/X');
+  for xidx = 1:length(value)
+    fprintf(fid, '   "%s"', value{xidx});
+  end
+else
+  fprintf(fid, '   ST/X');
+  for xidx = 1:length(value)
+    fprintf(fid, ['   ' options.Precision], value(xidx));
   end
 end
 fprintf(fid, '\n');
