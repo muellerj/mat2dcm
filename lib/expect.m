@@ -1,4 +1,4 @@
-function myassert(condition)
+function expect(condition)
   global ASSERTIONS;
   [stack, ~] = dbstack;
 
