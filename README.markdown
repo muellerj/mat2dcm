@@ -72,5 +72,35 @@ and the destination `*.dcm` file) and a number of optional key-value paris:
 
 Explanation, how the different data types are generated from Matlab variables.
 
+### Festwert
 
-## Todo
+Any scalar label is interpreted as a `FESTWERT`. The corresponding test is
+
+    all(size(value)) == 1
+
+### Festwerteblock
+
+If either dimension is not 1, the label is interpreted as a `FESTWERTEBLOCK`.
+
+### Kennfeld
+
+A `KENNFELD` labels needs to be a struct with fields `x`, `y` and `z`. The test
+is
+
+    isstruct(value) && isfield(value, 'x') && isfield(value, 'y') && isfield(value, 'z')
+
+### Kennlinie
+
+A `KENNLINIE` label is similar to a `KENNFELD`, but only requires fields `x` and
+`y`:
+
+    isstruct(value) && isfield(value, 'x') && isfield(value, 'y')
+
+### Stützstellenverteilung
+
+A `STUETZSTELLENVERTEILUNG` label is even less restrictive and only needs to
+have either a field `x` or a field `y`:
+
+    isstruct(value) && (isfield(value, 'x') || isfield(value, 'y'))
+
+
