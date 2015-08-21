@@ -6,7 +6,7 @@ resulting DCM. No emphasis is placed on full inforation transfer - instead only
 the value of the label is deemed important. The conversion is subsequently lossy
 and cannot be fully reversed.
 
-## Setup
+## Installation
 
 Simply copy the `mat2dcm.m` under `./lib` to somewhere in your `path`.
 
@@ -103,4 +103,10 @@ have either a field `x` or a field `y`:
 
     isstruct(value) && (isfield(value, 'x') || isfield(value, 'y'))
 
+## Contributing
 
+1. Fork it ( https://github.com/[my-github-username]/mat2dcm/fork )
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create a new Pull Request
