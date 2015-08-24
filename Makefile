@@ -9,6 +9,7 @@ MATLABINTERFACE := bin/im
 	@echo "cd('$(PWD)')" | $(MATLABINTERFACE) > /dev/null
 	@echo "clear all" | $(MATLABINTERFACE) > /dev/null
 	@echo "switch_encoding('UTF-8')" | $(MATLABINTERFACE) > /dev/null
+all: spec
 %: .setup
 	@if [ "$@" != "Makefile" ] && [ "$@" != "README.markdown" ]; then echo "make $@" | $(MATLABINTERFACE); fi
 clean:
