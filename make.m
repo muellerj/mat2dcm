@@ -14,9 +14,13 @@ if nargin < 1
   make('spec');
 else
   switch(option)
+    case 'all'
+      % Do nothing
     case 'clean'
       clc;
       evalin('base', 'clear all');
+      delete('tmp.mat');
+      delete('tmp.dcm');
     case 'spec'
       disp('# Running specs ...');
       run_specs;
