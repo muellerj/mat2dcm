@@ -11,3 +11,7 @@ MATLABINTERFACE := bin/im
 	@echo "switch_encoding('UTF-8')" | $(MATLABINTERFACE) > /dev/null
 %: .setup
 	@if [ "$@" != "Makefile" ] && [ "$@" != "README.markdown" ]; then echo "make $@" | $(MATLABINTERFACE); fi
+clean:
+	rm *.mat *.dcm
+
+.PHONY: clean
