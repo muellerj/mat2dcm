@@ -14,7 +14,7 @@ expect(K_SOME_SCALAR == 1.3);
 % Festwerteblock
 expect(all(size(K_SOME_VECTOR) == [1 3]));
 expect(all(K_SOME_VECTOR == [1.0 2.0 3.0]));
-expect(all(size(K_SOME_MATRIX) == [2 3]));
+expect(all(size(K_SOME_MATRIX) == [2 2]));
 expect(all(K_SOME_MATRIX == [1 2; 3 4]));
 
 % Stuetzstellenverteilung
