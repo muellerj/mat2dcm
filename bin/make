@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# Switch Matlab into the current folder
+echo "cd `pwd | xargs cygpath -w | sed 's:\\\\:/:g'`" | im
+
+# Execute the given command through the matlab interface
+echo "make $@" | im
