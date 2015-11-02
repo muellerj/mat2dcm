@@ -9,7 +9,10 @@ function run_specs(varargin)
   EXCEPTIONS = {};
 
   if nargin > 0
-    specfiles = dir(varargin{1});
+    specfiles = [];
+    for didx = 1:length(varargin)
+      specfiles = [specfiles; dir(varargin{didx})];
+    end
   else
     specfiles = dir([projectpath '/spec/*_spec.m']);
   end
