@@ -28,17 +28,16 @@ function run_specs(varargin)
   fprintf('\n');
 
   if not(isempty(EXCEPTIONS))
-    for eidx = 1:length(EXCEPTIONS)
-      rethrow(EXCEPTIONS{eidx});
-    end
+    for eidx = 1:length(EXCEPTIONS), rethrow(EXCEPTIONS{eidx}); end
   end
 
-  outcomes = cell2mat(cellfun(@(x) x.outcome, ASSERTIONS));
+  passes = cellfun(@(x) x.outcome, ASSERTIONS);
 
-  if all(outcomes)
+  if all(passes)
     fprintf('PASSED\n\n')
   else
-    fprintf([pluralise(length(find(outcomes == 0)), 'FAIL', 'FAILS') '\n\n']);
+    fprintf([pluralise(length(find(passes == 0)), 'FAIL', 'FAILS') '\n\n']);
+
     for aidx = 1:length(ASSERTIONS)
       if ASSERTIONS{aidx}.outcome == 0
         fprintf('Failure in %s: line %d\n', ...
