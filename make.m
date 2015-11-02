@@ -22,7 +22,6 @@ else
       delete('tmp.mat');
       delete('tmp.dcm');
     case 'spec'
-      disp('# Running specs ...');
       run_specs;
     otherwise
       error(['Unknown option: ' option]);

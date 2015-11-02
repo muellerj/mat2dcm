@@ -6,4 +6,10 @@ function expect(condition)
   assertion.stack = stack(2);
   assertion.outcome = condition;
   ASSERTIONS = {ASSERTIONS{:} assertion};
+
+  if condition
+    fprintf('.');
+  else
+    fprintf('F');
+  end
 end
