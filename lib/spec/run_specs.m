@@ -6,6 +6,7 @@ function run_specs(varargin)
 
   global ASSERTIONS;
   ASSERTIONS = {};
+  EXCEPTIONS = {};
 
   if nargin > 0
     specfiles = dir(varargin{1});
@@ -19,15 +20,22 @@ function run_specs(varargin)
     try
       feval(specfiles(fidx).name(1:end-2));
     catch exception
-      disp([exception.stack(1).file ':' num2str(exception.stack(1).line) ' - ' exception.message]);
+      EXCEPTIONS = {EXCEPTIONS{:} exception};
+      fprintf('E');
     end
   end
 
   fprintf('\n');
 
-  outcomes = cell2mat(cellfun(@(x) x.outcome, ASSERTIONS, 'UniformOutput', false));
+  if not(isempty(EXCEPTIONS))
+    for eidx = 1:length(EXCEPTIONS)
+      rethrow(EXCEPTIONS{eidx});
+    end
+  end
 
-  if all(outcomes == 1)
+  outcomes = cell2mat(cellfun(@(x) x.outcome, ASSERTIONS));
+
+  if all(outcomes)
     fprintf('PASSED\n\n')
   else
     fprintf([pluralise(length(find(outcomes == 0)), 'FAIL', 'FAILS') '\n\n']);

@@ -1,4 +1,9 @@
 function expect(condition)
+
+  if not(isscalar(condition))
+    error('Condition must be a scalar boolean value!');
+  end
+
   global ASSERTIONS;
   [stack, ~] = dbstack;
 
