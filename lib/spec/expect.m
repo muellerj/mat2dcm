@@ -1,6 +1,9 @@
 function expect(condition)
 
-  if not(isscalar(condition)) || not(islogical(condition))
+  % Guard against stupid data types
+  condition = logical(condition);
+
+  if not(isscalar(condition))
     error('Condition must be a scalar boolean value!');
   end
 
