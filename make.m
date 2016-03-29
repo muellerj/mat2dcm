@@ -6,30 +6,27 @@ function make(option, varargin)
 %
 %   make [option]
 
-% Add library paths
-addpath(genpath([projectpath '/lib']));
-addpath(genpath([projectpath '/spec']));
+  % Add library paths
+  addpath(genpath([projectpath '/lib']));
+  addpath(genpath([projectpath '/spec']));
 
-if nargin < 1
-  make('spec');
-else
-  switch(option)
-    case 'all'
-      % Do nothing
-    case 'clean'
-      clc;
-      evalin('base', 'clear all');
-      delete('tmp.mat');
-      delete('tmp.dcm');
-    case 'spec'
-      run_specs;
-    otherwise
-      error(['Unknown option: ' option]);
+  if nargin < 1
+    make('spec');
+  else
+    switch(option)
+      case 'clean'
+        clc;
+        evalin('base', 'clear all');
+        delete('tmp.mat');
+        delete('tmp.dcm');
+      case 'spec'
+        run_specs;
+      otherwise
+        error(['Unknown option: ' option]);
+    end
   end
 end
 
-function ppath = projectpath()
-% Return the current project root path
-fullpath = mfilename('fullpath');
-ppath    = regexp(fullpath, '(.*)[\\\/]make', 'tokens');
-ppath    = ppath{1}{1};
+function x = projectpath()
+  x = char(regexp(mfilename('fullpath'), '(.*)[\\\/]make', 'tokens', 'once'));
+end
