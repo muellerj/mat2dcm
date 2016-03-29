@@ -1,5 +1,4 @@
-function ppath = projectpath()
+function x = projectpath()
 % Return the current project root path
-fullpath = mfilename('fullpath');
-ppath    = regexp(fullpath, '(.*)[\\\/]lib', 'tokens');
-ppath    = regexprep(ppath{1}{1}, '\\', '/');
+  x = char(regexp(mfilename('fullpath'), '(.*)[\\\/]lib[\\\/]projectpath', 'tokens', 'once'));
+end
