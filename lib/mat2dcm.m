@@ -28,7 +28,7 @@ options = struct();
 options.Precision    = '%1.3f';
 options.Prefix       = '';
 options.Verbose      = true;
-options.Encoding     = 'windows-1250';
+options.Encoding     = '';
 
 % Initialise counters for statistic
 counter                         = struct();
