@@ -13,7 +13,7 @@ function mat2dcm(matfilename, dcmfilename, varargin)
 %   Precision     Precision of the exported parameter    %1.3f
 %   Prefix        Prefix for all labels                  ''
 %   Verbose       Report exported labels                 true
-%   Encoding      Encoding to use for DCM file           'windows-1250'
+%   Encoding      Encoding to use for DCM file           ''
 %
 % Jonas Mueller, EA-253
 % 02.07.2015
