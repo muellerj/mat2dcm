@@ -12,6 +12,7 @@ function mat2dcm(matfilename, dcmfilename, varargin)
 %   ----------------------------------------------------------------
 %   Precision     Precision of the exported parameter    %1.3f
 %   Prefix        Prefix for all labels                  ''
+%   Function      Function for all labels                ''
 %   Verbose       Report exported labels                 true
 %   Encoding      Encoding to use for DCM file           ''
 %
@@ -27,6 +28,7 @@ end
 options = struct();
 options.Precision    = '%1.3f';
 options.Prefix       = '';
+options.Function     = '';
 options.Verbose      = true;
 options.Encoding     = '';
 
@@ -120,6 +122,7 @@ fprintf(fid, '\n\n');
 
 function write_festwert(fid, options, name, value)
 fprintf(fid, 'FESTWERT %s\n', name);
+write_function(fid, options);
 if iscell(value)
   fprintf(fid, '   TEXT "%s"\n', value{:});
 else
@@ -133,6 +136,7 @@ if size(value, 1) == 1
 else
   fprintf(fid, 'FESTWERTEBLOCK %s %1.0f @ %1.0f\n', name, size(value, 2), size(value, 1));
 end
+write_function(fid, options);
 for ridx = 1:size(value, 1)
   if iscell(value)
   fprintf(fid, '   TEXT');
@@ -155,6 +159,7 @@ value = reshape(value, 1, size(value, 1)*size(value, 2));
 
 if size(value, 1) == 1
   fprintf(fid, 'FESTWERTEBLOCK %s %1.0f\n', name, length(value));
+  write_function(fid, options);
   fprintf(fid, '   EINHEIT_W "-"\n');
   fprintf(fid, '   WERT');
   for cidx = 1:length(value)
@@ -165,6 +170,7 @@ if size(value, 1) == 1
 else
   fprintf(fid, 'FESTWERTEBLOCK %s %1.0f @ %1.0f\n', name, ...
     size(value, 2), size(value, 1));
+  write_function(fid, options);
   fprintf(fid, '   EINHEIT_W "-"\n');
   for ridx = 1:size(value, 1)
     fprintf(fid, '   WERT');
@@ -183,6 +189,7 @@ else
   type = 'KENNLINIE';
 end
 fprintf(fid, '%s %s %1.0f\n', type, name, length(value.x));
+write_function(fid, options);
 if iscell(value.x)
   fprintf(fid, '   ST_TX/X');
   for xidx = 1:length(value.x)
@@ -212,6 +219,7 @@ fprintf(fid, 'END\n\n');
 function write_stuetzstellenverteilung(fid, options, name, value)
 if isfield(value, 'x'), value = value.x; else value = value.y; end
 fprintf(fid, 'STUETZSTELLENVERTEILUNG %s %1.0f\n', name, length(value));
+write_function(fid, options);
 if iscell(value)
   fprintf(fid, '   ST_TX/X');
   for xidx = 1:length(value)
@@ -233,6 +241,7 @@ else
   type = 'KENNFELD';
 end
 fprintf(fid, '%s %s %1.0f %1.0f\n', type, name, size(value.z, 2), size(value.z, 1));
+write_function(fid, options);
 if iscell(value.x)
   fprintf(fid, '   ST_TX/X');
   for xidx = 1:length(value.x)
@@ -282,6 +291,12 @@ function fid = open_file_connection(dcmfilename, options)
 if exist(dcmfilename, 'file'), delete(dcmfilename); end
 fid = fopen(dcmfilename, 'w+t', 'n', options.Encoding);
 if fid == -1, error('Cannot open DCM file for write access'); end
+
+function write_function(fid, options)
+% Write a function entry if one is given
+if not(strcmp(options.Function, ''))
+  fprintf(fid, '   FUNKTION %s\n', options.Function);
+end
 
 function c = ternary(condition, a, b)
 % Provide a shorthand for conditionals
