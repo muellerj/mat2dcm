@@ -19,6 +19,8 @@ function run_specs(varargin)
 
   fprintf(['Running ' pluralise(numel(specfiles), 'specfile', 'specfiles') '\n']);
 
+  close_testharness_models();
+
   for fidx = 1:numel(specfiles)
     try
       [~, fname, ~] = fileparts(specfiles{fidx});
@@ -58,6 +60,8 @@ function run_specs(varargin)
     end
   end
 
+  close_testharness_models();
+
 end
 
 function outstr = pluralise(n, singular, plural)
@@ -93,4 +97,18 @@ function newfiles = filterfiles(oldfiles, searchstr)
       newfiles{end+1} = oldfiles{fidx};
     end
   end
+end
+
+function close_testharness_models
+  models = find_system('SearchDepth', 0);
+  for midx = 1:numel(models)
+    if starts_with(models{midx}, 'testharness_')
+      bdclose(models{midx});
+    end
+  end
+  warning('off','Simulink:blocks:AssumingDefaultSimStateForSFcn')
+end
+
+function cond = starts_with(str, pat)
+  cond = strcmp(str(1:min(length(pat), length(str))), pat);
 end
