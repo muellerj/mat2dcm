@@ -1,27 +1,28 @@
 function run_specs(varargin)
-%RUN_SPECS [FOLDER]
+%RUN_SPECS [SEARCHSTR]
 %
-%  Run all available specs located at FOLDER/*_spec.m and report results.
-%  If no FOLDER is specified, [projectpath]/spec/*_spec.m is assumed.
+%  Run all available specs matching SEARCHSTR inside
+%  [rootpath]/spec/*
 
   global ASSERTIONS;
   ASSERTIONS = {};
   EXCEPTIONS = {};
 
   if nargin > 0
-    specfiles = [];
-    for didx = 1:length(varargin)
-      specfiles = [specfiles; dir(varargin{didx})];
-    end
+    searchstr = varargin{1};
   else
-    specfiles = dir([projectpath '/spec/*_spec.m']);
+    searchstr = '.';
   end
 
-  disp(['Running ' pluralise(length(specfiles), 'specfile', 'specfiles')]);
+  specfiles = collectfiles({}, fullfile(rootpath, 'spec'));
+  specfiles = filterfiles(specfiles, searchstr);
 
-  for fidx = 1:length(specfiles)
+  fprintf(['Running ' pluralise(numel(specfiles), 'specfile', 'specfiles') '\n']);
+
+  for fidx = 1:numel(specfiles)
     try
-      feval(specfiles(fidx).name(1:end-2));
+      [~, fname, ~] = fileparts(specfiles{fidx});
+      feval(fname);
     catch exception
       EXCEPTIONS = {EXCEPTIONS{:} exception};
       fprintf('E');
@@ -31,17 +32,25 @@ function run_specs(varargin)
   fprintf('\n');
 
   if not(isempty(EXCEPTIONS))
-    for eidx = 1:length(EXCEPTIONS), rethrow(EXCEPTIONS{eidx}); end
+    for eidx = 1:numel(EXCEPTIONS)
+      disp(EXCEPTIONS{eidx}.message);
+      for sidx = 1:numel(EXCEPTIONS{eidx}.stack)
+        fprintf('%s:%d\n' ,EXCEPTIONS{eidx}.stack(sidx).file, EXCEPTIONS{eidx}.stack(sidx).line);
+      end
+      disp(' ');
+    end
   end
 
   passes = cellfun(@(x) x.outcome, ASSERTIONS);
 
-  if all(passes)
+  if not(isempty(EXCEPTIONS))
+    fprintf('ERROR\n\n')
+  elseif all(passes)
     fprintf('PASSED\n\n')
   else
-    fprintf([pluralise(length(find(passes == 0)), 'FAIL', 'FAILS') '\n\n']);
+    fprintf([pluralise(numel(find(passes == 0)), 'FAIL', 'FAILS') '\n\n']);
 
-    for aidx = 1:length(ASSERTIONS)
+    for aidx = 1:numel(ASSERTIONS)
       if ASSERTIONS{aidx}.outcome == 0
         fprintf('Failure in %s: line %d\n', ...
           ASSERTIONS{aidx}.stack.file, ASSERTIONS{aidx}.stack.line);
@@ -56,5 +65,32 @@ function outstr = pluralise(n, singular, plural)
     outstr = ['1 ' singular];
   else
     outstr = [num2str(n) ' ' plural];
+  end
+end
+
+function newfiles = collectfiles(oldfiles, folder)
+  newfiles = oldfiles;
+  files = dir(folder);
+  for fidx = 3:numel(files)
+    if isdir(fullfile(folder, files(fidx).name))
+      newfiles = collectfiles(newfiles, fullfile(folder, files(fidx).name));
+    else
+      if regexp(files(fidx).name, '_spec.m$')
+        newfiles{end+1} = fullfile(folder, files(fidx).name);
+      end
+    end
+  end
+end
+
+function newfiles = filterfiles(oldfiles, searchstr)
+  searchstr = regexprep(searchstr, '\\', '/');
+  newfiles = {};
+  ignore   = fullfile(rootpath);
+  for fidx = 1:numel(oldfiles)
+    specname = strrep(oldfiles{fidx}, ignore, '');
+    specname = regexprep(specname, '\\', '/');
+    if regexp(specname, ['\<' searchstr '(\>|_spec.m)'])
+      newfiles{end+1} = oldfiles{fidx};
+    end
   end
 end
