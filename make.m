@@ -20,7 +20,7 @@ function make(option, varargin)
         delete('tmp.mat');
         delete('tmp.dcm');
       case 'spec'
-        run_specs;
+        run_specs(varargin{:});
       otherwise
         error(['Unknown option: ' option]);
     end
